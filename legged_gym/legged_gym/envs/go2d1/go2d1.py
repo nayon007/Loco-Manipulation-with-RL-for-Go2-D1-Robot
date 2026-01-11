@@ -279,6 +279,9 @@ class go2d1(LeggedRobot):
 
         half_col_size = self.cfg.terrain.tot_cols * self.cfg.terrain.horizontal_scale / 2
         half_row_size = self.cfg.terrain.tot_rows * self.cfg.terrain.horizontal_scale / 2
+        # keep a margin, but never larger than the half-size
+        margin = min(10.0, half_row_size - 0.5)
+        margin = max(0.0, margin)
         x_bounds = [- 2.5 * half_col_size / 5, - 2 * half_col_size / 5]
         y_bounds = [- half_row_size + 10, half_row_size - 10]
         print('origin x_bounds', x_bounds)
@@ -502,7 +505,12 @@ class go2d1(LeggedRobot):
             # go2d1
             pos = self.env_origins[i].clone()
             pos[:2] += torch_rand_float(-self.cfg.terrain.origin_perturb_range, self.cfg.terrain.origin_perturb_range, (2,1), device=self.device).squeeze(1)
-            start_pose.p = gymapi.Vec3(*pos)
+            # pos is env origin; add the robot initial pose (especially z)
+            start_pose.p = gymapi.Vec3(
+                float(pos[0] + self.base_init_state[0]),
+                float(pos[1] + self.base_init_state[1]),
+                float(pos[2] + self.base_init_state[2]),
+            )
             
             rigid_shape_props = self._process_rigid_shape_props(rigid_shape_props_asset, i)
             self.gym.set_asset_rigid_shape_properties(robot_asset, rigid_shape_props)
