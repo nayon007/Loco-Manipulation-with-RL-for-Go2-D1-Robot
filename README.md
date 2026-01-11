@@ -277,13 +277,3 @@ Also cite the original Deep-WBC paper by Mark et al.
 * **NVIDIA Isaac Gym Team**
 * **Mark Fzp et al. (Deep-WBC)**
 
----
-
-If you want, I can next:
-
-* Add **figures/videos section**
-* Write a **Methods section** suitable for a journal paper
-* Help convert this into an **Isaac Sim / Isaac Lab** version
-* Prepare a **reproducibility checklist**
-
-Just tell me.
