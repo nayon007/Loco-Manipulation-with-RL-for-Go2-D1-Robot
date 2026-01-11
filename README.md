@@ -1,9 +1,3 @@
-Below is a **clean, research-grade `README.md`** tailored exactly to what you built and debugged: a **Go2 quadruped with a 6-DoF arm (Go2-D1)** trained using **Deep Whole-Body Control (Deep-WBC)** on top of **Legged Gym + RSL-RL**, including all the fixes you discovered (URDF, gains, terrain, reward shaping, etc.).
-
-You can **copy-paste this directly** into your GitHub repository root as `README.md`.
-
----
-
 # Loco-Manipulation with Reinforcement Learning for Go2-D1 Robot
 
 This repository contains a **full reproduction and extension of the Deep Whole-Body Control (Deep-WBC) framework** for a **custom Go2 quadruped robot equipped with a 6-DoF manipulator (Go2-D1)**.
