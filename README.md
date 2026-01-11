@@ -245,21 +245,8 @@ This confirms correct whole-body coordination.
 
 ---
 
-## 📚 Citation
-
-If you use this work in research, please cite:
-
-```bibtex
-@misc{go2d1_deepwbc,
-  title={Loco-Manipulation with Reinforcement Learning for Go2-D1 Robot},
-  author={Hafiz Nayon},
-  year={2026},
-  note={Based on Deep Whole-Body Control}
-}
-```
-
-Also cite the original Deep-WBC paper by Mark et al.
-
+Cite the original Deep-WBC paper by Mark et al.
+GitHub: [https://github.com/MarkFzp/Deep-Whole-Body-Control](https://github.com/MarkFzp/Deep-Whole-Body-Control)
 ---
 
 ## ⚠️ Notes
