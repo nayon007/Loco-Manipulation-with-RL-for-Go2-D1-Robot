@@ -1,0 +1,1062 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- go2_d1: Isaac Sim–ready URDF (ROS 2 bridge via Action Graph)
+     Notes:
+       • No <gazebo> or Ignition plugins. Isaac Sim will ignore those anyway.
+       • No <transmission> blocks. Isaac Sim’s Articulation Controller drives joints directly.
+       • Use the ROS2 Articulation Controller node in the Action Graph to send position/velocity/effort arrays.
+       • Foot friction should be set in Isaac Sim via Physics Materials on the USD after import. -->
+
+<robot name="go2_d1">
+
+  <!-- =========================
+       BASE + SENSORS MOUNTS
+       ========================= -->
+  <link name="base">
+    <inertial>
+      <origin xyz="0.021112 0 -0.005366" rpy="0 0 0"/>
+      <mass value="6.921"/>
+      <inertia ixx="0.02448" ixy="0.00012166" ixz="0.0014849" iyy="0.098077" iyz="-3.12E-05" izz="0.107"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/base.stl"/>
+      </geometry>
+      <material name="mat_base"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.3762 0.0935 0.114"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="Head_upper">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.09" radius="0.05"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="Head_upper_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0.285 0 0.01" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="Head_upper"/>
+  </joint>
+
+  <link name="Head_lower">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.047"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="Head_lower_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0.008 0 -0.07" rpy="0 0 0"/>
+    <parent link="Head_upper"/>
+    <child link="Head_lower"/>
+  </joint>
+
+  <link name="imu">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="-0.02557 0 0.04232" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="imu"/>
+  </joint>
+
+  <link name="radar">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="radar_joint" type="fixed">
+    <origin xyz="0.28945 0 -0.046825" rpy="0 2.8782 0"/>
+    <parent link="base"/>
+    <child link="radar"/>
+  </joint>
+
+  <link name="front_camera"/>
+  <joint name="front_camera_joint" type="fixed">
+    <origin xyz="0.32715 -0.00003 0.04297" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="front_camera"/>
+  </joint>
+
+  <!-- =========================
+       FRONT-LEFT LEG
+       ========================= -->
+  <link name="FL_hip">
+    <inertial>
+      <origin xyz="-0.0054 0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.678"/>
+      <inertia ixx="0.00048" ixy="-3.01E-06" ixz="1.11E-06" iyy="0.000884" iyz="-1.42E-06" izz="0.000596"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/hip.stl"/></geometry>
+      <material name="mat_white"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder length="0.04" radius="0.046"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_hip_joint" type="revolute">
+    <origin xyz="0.1934 0.0465 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="FL_hip"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="FL_hip_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000111842" ixy="0.0" ixz="0.0" iyy="0.000059647" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FL_hip_rotor_joint" type="fixed">
+    <origin xyz="0.11215 0.04675 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="FL_hip_rotor"/>
+  </joint>
+
+  <link name="FL_thigh">
+    <inertial>
+      <origin xyz="-0.00374 -0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.152"/>
+      <inertia ixx="0.00584" ixy="8.72E-05" ixz="-0.000289" iyy="0.0058" iyz="0.000808" izz="0.00103"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/thigh.stl"/></geometry>
+      <material name="mat_white2"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.213 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_thigh_joint" type="revolute">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="FL_hip"/>
+    <child link="FL_thigh"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="3.4907" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="FL_thigh_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FL_thigh_rotor_joint" type="fixed">
+    <origin xyz="0 -0.00015 0" rpy="0 0 0"/>
+    <parent link="FL_hip"/>
+    <child link="FL_thigh_rotor"/>
+  </joint>
+
+  <link name="FL_calf">
+    <inertial>
+      <origin xyz="0.00548 -0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.154"/>
+      <inertia ixx="0.00108" ixy="3.4E-07" ixz="1.72E-05" iyy="0.0011" iyz="8.28E-06" izz="3.29E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/calf.stl"/></geometry>
+      <material name="mat_white3"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.008 0 -0.06" rpy="0 -0.21 0"/>
+      <geometry><cylinder length="0.12" radius="0.012"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="FL_thigh"/>
+    <child link="FL_calf"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="45.43" velocity="15.70"/>
+  </joint>
+
+  <link name="FL_calflower">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.065" radius="0.011"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_calflower_joint" type="fixed">
+    <origin xyz="0.020 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="FL_calf"/>
+    <child link="FL_calflower"/>
+  </joint>
+
+  <link name="FL_calflower1">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.03" radius="0.0155"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_calflower1_joint" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="FL_calflower"/>
+    <child link="FL_calflower1"/>
+  </joint>
+
+  <link name="FL_calf_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FL_calf_rotor_joint" type="fixed">
+    <origin xyz="0 -0.03235 0" rpy="0 0 0"/>
+    <parent link="FL_thigh"/>
+    <child link="FL_calf_rotor"/>
+  </joint>
+
+  <link name="FL_foot">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/foot.stl"/></geometry>
+      <material name="mat_white4"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+  <joint name="FL_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="FL_calf"/>
+    <child link="FL_foot"/>
+  </joint>
+
+  <!-- =========================
+       FRONT-RIGHT LEG
+       ========================= -->
+  <link name="FR_hip">
+    <inertial>
+      <origin xyz="-0.0054 -0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.678"/>
+      <inertia ixx="0.00048" ixy="3.01E-06" ixz="1.11E-06" iyy="0.000884" iyz="1.42E-06" izz="0.000596"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/hip.stl"/></geometry>
+      <material name="mat_white5"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder length="0.04" radius="0.046"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_hip_joint" type="revolute">
+    <origin xyz="0.1934 -0.0465 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="FR_hip"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="FR_hip_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000111842" ixy="0.0" ixz="0.0" iyy="0.000059647" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FR_hip_rotor_joint" type="fixed">
+    <origin xyz="0.11215 -0.04675 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="FR_hip_rotor"/>
+  </joint>
+
+  <link name="FR_thigh">
+    <inertial>
+      <origin xyz="-0.00374 0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.152"/>
+      <inertia ixx="0.00584" ixy="-8.72E-05" ixz="-0.000289" iyy="0.0058" iyz="-0.000808" izz="0.00103"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/thigh_mirror.stl"/></geometry>
+      <material name="mat_white6"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.213 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="FR_hip"/>
+    <child link="FR_thigh"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="3.4907" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="FR_thigh_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FR_thigh_rotor_joint" type="fixed">
+    <origin xyz="0 0.00015 0" rpy="0 0 0"/>
+    <parent link="FR_hip"/>
+    <child link="FR_thigh_rotor"/>
+  </joint>
+
+  <link name="FR_calf">
+    <inertial>
+      <origin xyz="0.00548 0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.154"/>
+      <inertia ixx="0.00108" ixy="-3.4E-07" ixz="1.72E-05" iyy="0.0011" iyz="-8.28E-06" izz="3.29E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/calf_mirror.stl"/></geometry>
+      <material name="mat_white7"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder length="0.12" radius="0.013"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="FR_thigh"/>
+    <child link="FR_calf"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="45.43" velocity="15.70"/>
+  </joint>
+
+  <link name="FR_calflower">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.065" radius="0.011"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_calflower_joint" type="fixed">
+    <origin xyz="0.020 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="FR_calf"/>
+    <child link="FR_calflower"/>
+  </joint>
+
+  <link name="FR_calflower1">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.03" radius="0.0155"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_calflower1_joint" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="FR_calflower"/>
+    <child link="FR_calflower1"/>
+  </joint>
+
+  <link name="FR_calf_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="FR_calf_rotor_joint" type="fixed">
+    <origin xyz="0 0.03235 0" rpy="0 0 0"/>
+    <parent link="FR_thigh"/>
+    <child link="FR_calf_rotor"/>
+  </joint>
+
+  <link name="FR_foot">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/foot.stl"/></geometry>
+      <material name="mat_white8"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+  <joint name="FR_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="FR_calf"/>
+    <child link="FR_foot"/>
+  </joint>
+
+  <!-- =========================
+       REAR-LEFT LEG
+       ========================= -->
+  <link name="RL_hip">
+    <inertial>
+      <origin xyz="0.0054 0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.678"/>
+      <inertia ixx="0.00048" ixy="3.01E-06" ixz="-1.11E-06" iyy="0.000884" iyz="-1.42E-06" izz="0.000596"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 3.1415 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/hip.stl"/></geometry>
+      <material name="mat_white9"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder length="0.04" radius="0.046"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_hip_joint" type="revolute">
+    <origin xyz="-0.1934 0.0465 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="RL_hip"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="RL_hip_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000111842" ixy="0.0" ixz="0.0" iyy="0.000059647" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RL_hip_rotor_joint" type="fixed">
+    <origin xyz="-0.11215 0.04675 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="RL_hip_rotor"/>
+  </joint>
+
+  <link name="RL_thigh">
+    <inertial>
+      <origin xyz="-0.00374 -0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.152"/>
+      <inertia ixx="0.00584" ixy="8.72E-05" ixz="-0.000289" iyy="0.0058" iyz="0.000808" izz="0.00103"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/thigh.stl"/></geometry>
+      <material name="mat_white10"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.213 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_thigh_joint" type="revolute">
+    <origin xyz="0 0.0955 0" rpy="0 0 0"/>
+    <parent link="RL_hip"/>
+    <child link="RL_thigh"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.5236" upper="4.5379" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="RL_thigh_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RL_thigh_rotor_joint" type="fixed">
+    <origin xyz="0 -0.00015 0" rpy="0 0 0"/>
+    <parent link="RL_hip"/>
+    <child link="RL_thigh_rotor"/>
+  </joint>
+
+  <link name="RL_calf">
+    <inertial>
+      <origin xyz="0.00548 -0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.154"/>
+      <inertia ixx="0.00108" ixy="3.4E-07" ixz="1.72E-05" iyy="0.0011" iyz="8.28E-06" izz="3.29E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/calf.stl"/></geometry>
+      <material name="mat_white11"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder length="0.12" radius="0.013"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="RL_thigh"/>
+    <child link="RL_calf"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="45.43" velocity="15.70"/>
+  </joint>
+
+  <link name="RL_calflower">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.065" radius="0.011"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_calflower_joint" type="fixed">
+    <origin xyz="0.020 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="RL_calf"/>
+    <child link="RL_calflower"/>
+  </joint>
+
+  <link name="RL_calflower1">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.03" radius="0.0155"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_calflower1_joint" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="RL_calflower"/>
+    <child link="RL_calflower1"/>
+  </joint>
+
+  <link name="RL_calf_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RL_calf_rotor_joint" type="fixed">
+    <origin xyz="0 -0.03235 0" rpy="0 0 0"/>
+    <parent link="RL_thigh"/>
+    <child link="RL_calf_rotor"/>
+  </joint>
+
+  <link name="RL_foot">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/foot.stl"/></geometry>
+      <material name="mat_white12"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+  <joint name="RL_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="RL_calf"/>
+    <child link="RL_foot"/>
+  </joint>
+
+  <!-- =========================
+       REAR-RIGHT LEG
+       ========================= -->
+  <link name="RR_hip">
+    <inertial>
+      <origin xyz="0.0054 -0.00194 -0.000105" rpy="0 0 0"/>
+      <mass value="0.678"/>
+      <inertia ixx="0.00048" ixy="-3.01E-06" ixz="-1.11E-06" iyy="0.000884" iyz="1.42E-06" izz="0.000596"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 3.1415 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/hip.stl"/></geometry>
+      <material name="mat_white13"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.08 0" rpy="1.5707963267948966 0 0"/>
+      <geometry><cylinder length="0.04" radius="0.046"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_hip_joint" type="revolute">
+    <origin xyz="-0.1934 -0.0465 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="RR_hip"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.0472" upper="1.0472" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="RR_hip_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000111842" ixy="0.0" ixz="0.0" iyy="0.000059647" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RR_hip_rotor_joint" type="fixed">
+    <origin xyz="-0.11215 -0.04675 0" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="RR_hip_rotor"/>
+  </joint>
+
+  <link name="RR_thigh">
+    <inertial>
+      <origin xyz="-0.00374 0.0223 -0.0327" rpy="0 0 0"/>
+      <mass value="1.152"/>
+      <inertia ixx="0.00584" ixy="-8.72E-05" ixz="-0.000289" iyy="0.0058" iyz="-0.000808" izz="0.00103"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/thigh_mirror.stl"/></geometry>
+      <material name="mat_white14"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1065" rpy="0 1.5707963267948966 0"/>
+      <geometry><box size="0.213 0.0245 0.034"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.0955 0" rpy="0 0 0"/>
+    <parent link="RR_hip"/>
+    <child link="RR_thigh"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-0.5236" upper="4.5379" effort="23.7" velocity="30.1"/>
+  </joint>
+
+  <link name="RR_thigh_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RR_thigh_rotor_joint" type="fixed">
+    <origin xyz="0 0.00015 0" rpy="0 0 0"/>
+    <parent link="RR_hip"/>
+    <child link="RR_thigh_rotor"/>
+  </joint>
+
+  <link name="RR_calf">
+    <inertial>
+      <origin xyz="0.00548 0.000975 -0.115" rpy="0 0 0"/>
+      <mass value="0.154"/>
+      <inertia ixx="0.00108" ixy="-3.4E-07" ixz="1.72E-05" iyy="0.0011" iyz="-8.28E-06" izz="3.29E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/calf_mirror.stl"/></geometry>
+      <material name="mat_white15"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 -0.06" rpy="0 -0.2 0"/>
+      <geometry><cylinder length="0.12" radius="0.013"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="RR_thigh"/>
+    <child link="RR_calf"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.7227" upper="-0.83776" effort="45.43" velocity="15.70"/>
+  </joint>
+
+  <link name="RR_calflower">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.065" radius="0.011"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_calflower_joint" type="fixed">
+    <origin xyz="0.020 0 -0.148" rpy="0 0.05 0"/>
+    <parent link="RR_calf"/>
+    <child link="RR_calflower"/>
+  </joint>
+
+  <link name="RR_calflower1">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder length="0.03" radius="0.0155"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_calflower1_joint" type="fixed">
+    <origin xyz="-0.01 0 -0.04" rpy="0 0.48 0"/>
+    <parent link="RR_calflower"/>
+    <child link="RR_calflower1"/>
+  </joint>
+
+  <link name="RR_calf_rotor">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <mass value="0.089"/>
+      <inertia ixx="0.000059647" ixy="0.0" ixz="0.0" iyy="0.000111842" iyz="0.0" izz="0.000059647"/>
+    </inertial>
+  </link>
+  <joint name="RR_calf_rotor_joint" type="fixed">
+    <origin xyz="0 0.03235 0" rpy="0 0 0"/>
+    <parent link="RR_thigh"/>
+    <child link="RR_calf_rotor"/>
+  </joint>
+
+  <link name="RR_foot">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.04"/>
+      <inertia ixx="9.6e-06" ixy="0" ixz="0" iyy="9.6e-06" iyz="0" izz="9.6e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/foot.stl"/></geometry>
+      <material name="mat_white16"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.002 0 0" rpy="0 0 0"/>
+      <geometry><sphere radius="0.022"/></geometry>
+    </collision>
+  </link>
+  <joint name="RR_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.213" rpy="0 0 0"/>
+    <parent link="RR_calf"/>
+    <child link="RR_foot"/>
+  </joint>
+
+  <!-- =========================
+       7-DoF ARM + PINCH FINGERS
+       ========================= -->
+  <!-- Arm base mount to robot base -->
+  <joint name="floating_base" type="fixed">
+    <origin xyz="0 0 0.055" rpy="0 0 0"/>
+    <parent link="base"/>
+    <child link="trunk"/>
+  </joint>
+
+  <link name="trunk">
+    <inertial>
+      <origin xyz="-0.00048697 -2.9605E-12 0.017142" rpy="0 0 0"/>
+      <mass value="0.077233"/>
+      <inertia ixx="0.00010316" ixy="-1.0285E-14" ixz="2.0449E-07" iyy="0.00011888" iyz="7.3026E-15" izz="0.00018362"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/trunk.STL"/></geometry>
+      <material name="mat_arm0"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/trunk.STL"/></geometry>
+    </collision>
+  </link>
+
+  <link name="Link1">
+    <inertial>
+      <origin xyz="0.0024649 0.00010517 0.032696" rpy="0 0 0"/>
+      <mass value="0.13174"/>
+      <inertia ixx="6.7236E-05" ixy="-5.5664E-08" ixz="7.0454E-08" iyy="5.416E-05" iyz="-3.5709E-07" izz="4.6637E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link1.STL"/></geometry>
+      <material name="mat_arm1"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link1.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint1" type="revolute">
+    <origin xyz="0 0 0.0533" rpy="0 0 -3.1416"/>
+    <parent link="trunk"/>
+    <child link="Link1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.35" upper="2.35" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link2">
+    <inertial>
+      <origin xyz="0.0002018 0.19201 -0.027007" rpy="0 0 0"/>
+      <mass value="0.20213"/>
+      <inertia ixx="0.00025682" ixy="-1.139E-07" ixz="5.5667E-08" iyy="6.3307E-05" iyz="-3.5717E-07" izz="0.00022968"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link2.STL"/></geometry>
+      <material name="mat_arm2"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link2.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint2" type="revolute">
+    <origin xyz="0 0.028 0.0563" rpy="1.5708 0 -3.1416"/>
+    <parent link="Link1"/>
+    <child link="Link2"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="-1.57" upper="1.57" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link3">
+    <inertial>
+      <origin xyz="0.015164 0.044482 -0.027461" rpy="0 0 0"/>
+      <mass value="0.0629"/>
+      <inertia ixx="1.7232E-05" ixy="-2.6967E-06" ixz="-9.4911E-11" iyy="1.2606E-05" iyz="-9.9169E-11" izz="1.4964E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link3.STL"/></geometry>
+      <material name="mat_arm3"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link3.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint3" type="revolute">
+    <origin xyz="0 0.2693 0.0009" rpy="0 0 0"/>
+    <parent link="Link2"/>
+    <child link="Link3"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="-1.57" upper="1.57" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link4">
+    <inertial>
+      <origin xyz="-0.00029556 -0.00016104 0.091339" rpy="0 0 0"/>
+      <mass value="0.083332"/>
+      <inertia ixx="3.9308E-05" ixy="1.0126E-08" ixz="-9.4316E-08" iyy="3.4378E-05" iyz="-1.6915E-09" izz="1.1597E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link4.STL"/></geometry>
+      <material name="mat_arm4"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link4.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint4" type="revolute">
+    <origin xyz="0.0577 0.042 -0.0275" rpy="-1.5708 0 -1.5708"/>
+    <parent link="Link3"/>
+    <child link="Link4"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.35" upper="2.35" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link5">
+    <inertial>
+      <origin xyz="0.040573 0.0062891 -0.023838" rpy="0 0 0"/>
+      <mass value="0.053817"/>
+      <inertia ixx="1.3072E-05" ixy="-3.9511E-07" ixz="-3.1889E-10" iyy="8.6301E-06" iyz="-1.8416E-09" izz="1.1049E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link5.STL"/></geometry>
+      <material name="mat_arm5"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link5.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint5" type="revolute">
+    <origin xyz="-0.0001 -0.0237 0.14018" rpy="1.5708 -1.5708 0"/>
+    <parent link="Link4"/>
+    <child link="Link5"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="-1.57" upper="1.57" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link6">
+    <inertial>
+      <origin xyz="-0.0068528 -3.9973E-06 0.039705" rpy="0 0 0"/>
+      <mass value="0.077892"/>
+      <inertia ixx="3.8236E-05" ixy="1.3465E-08" ixz="-2.0614E-07" iyy="1.7707E-05" iyz="-6.7117E-10" izz="4.8839E-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link6.STL"/></geometry>
+      <material name="mat_arm6"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link6.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint6" type="revolute">
+    <origin xyz="0.0825 -0.0010782 -0.023822" rpy="-1.5708 0 -1.5708"/>
+    <parent link="Link5"/>
+    <child link="Link6"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="-2.35" upper="2.35" effort="20" velocity="20"/>
+  </joint>
+
+  <!-- Pinch fingers: prismatic, with mimic so you only command Joint7_1 -->
+  <link name="Link7_1">
+    <inertial>
+      <origin xyz="0.018927 0.006 0.012082" rpy="0 0 0"/>
+      <mass value="0.015046"/>
+      <inertia ixx="1.2692E-06" ixy="0" ixz="-1.133E-07" iyy="2.0229E-06" iyz="0" izz="2.6177E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link7_1.STL"/></geometry>
+      <material name="mat_arm7a"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link7_1.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint7_1" type="prismatic">
+    <origin xyz="-0.0056012 -0.029636 0.0706" rpy="-1.5714 -1.5708 0"/>
+    <parent link="Link6"/>
+    <child link="Link7_1"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="0.0" upper="0.03" effort="20" velocity="20"/>
+  </joint>
+
+  <link name="Link7_2">
+    <inertial>
+      <origin xyz="0.018927 -0.006 0.012082" rpy="0 0 0"/>
+      <mass value="0.015046"/>
+      <inertia ixx="1.2692E-06" ixy="0" ixz="-1.133E-07" iyy="2.0229E-06" iyz="0" izz="2.6177E-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link7_2.STL"/></geometry>
+      <material name="mat_arm7b"><color rgba="1 1 1 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><mesh filename="/home/sml-workstation/Deep-WBC/legged_gym/resources/robots/go2d1/meshes/Link7_2.STL"/></geometry>
+    </collision>
+  </link>
+  <joint name="Joint7_2" type="prismatic">
+    <origin xyz="-0.0056388 0.02964 0.0706" rpy="1.5702 -1.5708 0"/>
+    <parent link="Link6"/>
+    <child link="Link7_2"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.03" upper="0.0" effort="20" velocity="20"/>
+    <mimic joint="Joint7_1" multiplier="-1"/>
+  </joint>
+
+  <!-- =========================
+       ROS 2 CONTROL (optional metadata for tooling; Isaac Sim ignores the plugin part)
+       Use this to document interfaces for external tools / sanity. In Isaac Sim, the
+       ROS2 Articulation Controller node will map to these joints by name.
+       ========================= -->
+  <ros2_control name="WholeBodyEffort" type="system">
+    <!-- No <hardware> plugin declared on purpose; this block is advisory for tools.
+         Command: effort; State: position/velocity/effort -->
+    <!-- Legs -->
+    <joint name="FL_hip_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="FL_thigh_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="FL_calf_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+
+    <joint name="FR_hip_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="FR_thigh_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="FR_calf_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+
+    <joint name="RL_hip_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="RL_thigh_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="RL_calf_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+
+    <joint name="RR_hip_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="RR_thigh_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="RR_calf_joint">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+
+    <!-- Arm: command all except the mimicked finger -->
+    <joint name="Joint1">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint2">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint3">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint4">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint5">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint6">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <joint name="Joint7_1">
+      <command_interface name="effort"/>
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+    <!-- Mimicked finger: state only, no command interface -->
+    <joint name="Joint7_2">
+      <state_interface name="position"/><state_interface name="velocity"/><state_interface name="effort"/>
+    </joint>
+  </ros2_control>
+
+</robot>
+

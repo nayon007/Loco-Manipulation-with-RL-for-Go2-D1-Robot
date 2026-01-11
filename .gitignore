@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Training outputs / logs (your tree has a lot)
+logs/
+wandb/
+*.tfevents.*
+
+# RL checkpoints / exported models (avoid huge repo)
+*.pt
+*.pth
+*.ckpt
+
+# OS/editor
+.DS_Store
+*.swp
+
+# If you generate datasets or large binaries
+*.zip
+*.tar
+*.tar.gz
+.DS_Store
